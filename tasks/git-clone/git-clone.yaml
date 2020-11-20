@@ -49,3 +49,29 @@ spec:
     image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
     name: setup-builder-home
     resources: {}
+  - script: |
+      #!/usr/bin/env bash
+      if [[ ${UPDATE_VERSION:-} == "Makefile"  ]]; then
+        VERSION_BUMP=${VERSION_BUMP:-patch}
+        if ! [ -z ${VERSION_BUMP} ]; then
+          VERSION=${VERSION:-$(git semver --next-${VERSION_BUMP} 2> /dev/null  || echo 'unknown')}
+        else
+          VERSION=${VERSION:-$(git semver 2> /dev/null  || echo 'unknown')}
+        fi
+        echo "${UPDATE_VERSION} version: $VERSION"
+        sed -i "s@^VERSION .*@VERSION ?= ${VERSION}@" ${UPDATE_VERSION}
+      fi
+    image: quay.io/krestomatio/ansible
+    name: prepare-makefile
+    workingDir: /workspace/source
+  - script: |
+      #!/usr/bin/env bash
+      if [[ ${PROJECT_TIMESTAMP:-} == "midnight" ]]; then
+        # set midnight timestamp until podman > 2.1.0 (adds option to omit or set timestamp)
+        project_timestamp=$(date -u +%Y%m%d0000)
+        echo "Setting project timestamp to: ${project_timestamp}"
+        find . -exec touch -t $project_timestamp '{}' \;
+      fi
+    image: quay.io/krestomatio/ansible
+    name: project-timestamp
+    workingDir: /workspace/source
