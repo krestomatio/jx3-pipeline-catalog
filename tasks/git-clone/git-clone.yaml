@@ -9,17 +9,17 @@ spec:
     mountPath: /workspace
   steps:
   - script: |
-      #!/usr/bin/env bash
+      #!/bin/sh
       export SUBDIR="source"
-      echo "git cloning url: $REPO_URL version $PULL_PULL_SHA to dir: $SUBDIR"
+      echo "git cloning url: $REPO_URL version $PULL_BASE_SHA to dir: $SUBDIR"
       git config --global --add user.name ${GIT_AUTHOR_NAME:-krestomatio-cibot}
       git config --global --add user.email ${GIT_AUTHOR_EMAIL:-jobcespedes@krestomatio.com}
       git config --global credential.helper store
       git clone $REPO_URL $SUBDIR
       cd $SUBDIR
-      git checkout $PULL_PULL_SHA
-      echo "checked out revision: $PULL_PULL_SHA to dir: $SUBDIR"
-    image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
+      git checkout $PULL_BASE_SHA
+      echo "checked out revision: $PULL_BASE_SHA to dir: $SUBDIR"
+    image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.19.0
     name: git-clone
     resources: { }
     workingDir: /workspace
@@ -28,7 +28,7 @@ spec:
     - --tags
     command:
     - git
-    image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
+    image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.19.0
     name: git-tags
     workingDir: /workspace/source
   - args:
@@ -38,17 +38,9 @@ spec:
     - --recursive
     command:
     - git
-    image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
+    image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.19.0
     name: git-submodule
     workingDir: /workspace/source
-  - args:
-    - '[ -d /builder/home ] || mkdir -p /builder && ln -s /tekton/home /builder/home'
-    command:
-    - /bin/sh
-    - -c
-    image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
-    name: setup-builder-home
-    resources: {}
   - script: |
       #!/usr/bin/env bash
       if [[ ${UPDATE_VERSION:-} == "Makefile"  ]]; then
