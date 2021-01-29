@@ -11,14 +11,17 @@ spec:
   - script: |
       #!/bin/sh
       export SUBDIR="source"
-      echo "git cloning url: $REPO_URL version $PULL_BASE_SHA to dir: $SUBDIR"
       git config --global --add user.name ${GIT_AUTHOR_NAME:-krestomatio-cibot}
       git config --global --add user.email ${GIT_AUTHOR_EMAIL:-jobcespedes@krestomatio.com}
       git config --global credential.helper store
-      git clone $REPO_URL $SUBDIR
-      cd $SUBDIR
-      git checkout $PULL_BASE_SHA
-      echo "checked out revision: $PULL_BASE_SHA to dir: $SUBDIR"
+      if [ -z "$BRANCH_NAME" ]; then
+        # No branch provided
+        echo "git cloning url: $REPO_URL to dir: $SUBDIR"
+        git clone $REPO_URL $SUBDIR
+      else
+        echo "git cloning url: $REPO_URL branch $BRANCH_NAME to dir: $SUBDIR"
+        git clone -b "$BRANCH_NAME" $REPO_URL $SUBDIR
+      fi
     image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.19.0
     name: git-clone
     resources: { }
