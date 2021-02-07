@@ -49,9 +49,9 @@ spec:
       if [[ ${UPDATE_VERSION:-} == "Makefile"  ]]; then
         VERSION_BUMP=${VERSION_BUMP:-patch}
         if ! [ -z ${VERSION_BUMP} ]; then
-          VERSION=${VERSION:-$(git semver --next-${VERSION_BUMP} 2> /dev/null  || echo 'unknown')}
+          VERSION=${VERSION:-$(git semver --next-${VERSION_BUMP} 2> /dev/null  || echo '0.0.1')}
         else
-          VERSION=${VERSION:-$(git semver 2> /dev/null  || echo 'unknown')}
+          VERSION=${VERSION:-$(git semver 2> /dev/null  || echo '0.0.1')}
         fi
         echo "${UPDATE_VERSION} version: $VERSION"
         sed -i "s@^VERSION .*@VERSION ?= ${VERSION}@" ${UPDATE_VERSION}
