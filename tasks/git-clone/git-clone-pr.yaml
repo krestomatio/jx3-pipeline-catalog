@@ -48,21 +48,22 @@ spec:
     image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.19.0
     name: git-tags
     workingDir: /workspace/source
-  - script: |
-      #!/usr/bin/env bash
-      if [[ ${UPDATE_VERSION:-} == "Makefile" ]]; then
-        VERSION_BUMP=${VERSION_BUMP:-patch}
-        if ! [ -z ${VERSION_BUMP} ]; then
-          VERSION=${VERSION:-$(git semver --next-${VERSION_BUMP} 2> /dev/null  || echo 'unknown')}-$(git rev-parse --short HEAD)
-        else
-          VERSION=${VERSION:-$(git semver 2> /dev/null  || echo 'unknown')}-$(git rev-parse --short HEAD)
-        fi
-        echo "${UPDATE_VERSION} version: $VERSION"
-        sed -i "s@^VERSION .*@VERSION ?= ${VERSION}@" ${UPDATE_VERSION}
-      fi
-    image: quay.io/krestomatio/ansible
-    name: prepare-makefile
+  - image: gcr.io/jenkinsxio/jx-release-version:2.2.3
+    name: next-version
+    resources: {}
     workingDir: /workspace/source
+    script: |
+      #!/usr/bin/env sh
+      export VERSION=$(jx-release-version)
+      if ! [ -z ${VERSION_FILE} ]; then
+        echo $VERSION > VERSION
+      fi
+      if ! [ -z ${VERSION_MAKEFILE} ]; then
+        sed -i "s@^VERSION .*@VERSION ?= ${VERSION}@" Makefile
+      fi
+      if ! [ -z ${VERSION_PACKAGE} ]; then
+        sed -i "s@\"version\":.*@\"version\": \"$VERSION\",@" package.json
+      fi
   - script: |
       #!/usr/bin/env bash
       if [[ ${PROJECT_TIMESTAMP:-} == "midnight" ]]; then
