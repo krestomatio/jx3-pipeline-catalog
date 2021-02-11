@@ -48,16 +48,22 @@ spec:
     name: next-version
     resources: {}
     workingDir: /workspace/source
+    env:
+    - name: NEXT_VERSION
+      value: semantic
     script: |
       #!/usr/bin/env sh
       export VERSION=$(jx-release-version)
       if ! [ -z ${VERSION_FILE} ]; then
+        echo "Set version in VERSION file to: $VERSION"
         echo $VERSION > VERSION
       fi
       if ! [ -z ${VERSION_MAKEFILE} ]; then
+        echo "Set version in Makefile to: $VERSION"
         sed -i "s@^VERSION .*@VERSION ?= ${VERSION}@" Makefile
       fi
       if ! [ -z ${VERSION_PACKAGE} ]; then
+        echo "Set version in package.json to: $VERSION"
         sed -i "s@\"version\":.*@\"version\": \"$VERSION\",@" package.json
       fi
   - script: |
