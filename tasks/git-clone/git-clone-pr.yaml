@@ -70,6 +70,10 @@ spec:
         echo "Set version in package.json to: $VERSION"
         sed -i "s@\"version\":.*@\"version\": \"$VERSION\",@" package.json
       fi
+      if ! [ -z ${VERSION_CHART} ]; then
+        sed -i "s/^version:.*/version: $VERSION/" charts/$REPO_NAME/Chart.yaml
+        sed -i "s/tag:.*/tag: $VERSION/" charts/$REPO_NAME/values.yaml
+      fi
   - script: |
       #!/usr/bin/env bash
       if [[ ${PROJECT_TIMESTAMP:-} == "midnight" ]]; then
