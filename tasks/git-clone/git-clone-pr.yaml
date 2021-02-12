@@ -71,6 +71,7 @@ spec:
         sed -i "s@\"version\":.*@\"version\": \"$VERSION\",@" package.json
       fi
       if ! [ -z ${VERSION_CHART} ]; then
+        echo "Set version in chart dir to: $VERSION"
         sed -i "s/^version:.*/version: $VERSION/" charts/$REPO_NAME/Chart.yaml
         sed -i "s/tag:.*/tag: $VERSION/" charts/$REPO_NAME/values.yaml
       fi
