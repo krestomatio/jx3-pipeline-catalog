@@ -57,7 +57,7 @@ spec:
       value: semantic
     script: |
       #!/usr/bin/env sh
-      export VERSION=$(jx-release-version)
+      export VERSION=$(jx-release-version)-snapshot
       if ! [ -z ${VERSION_FILE} ]; then
         echo "Set version in VERSION file to: $VERSION"
         echo $VERSION > VERSION
