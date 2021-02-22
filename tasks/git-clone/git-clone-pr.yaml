@@ -54,7 +54,7 @@ spec:
     workingDir: /workspace/source
     env:
     - name: NEXT_VERSION
-      value: semantic
+      value: increment
     script: |
       #!/usr/bin/env sh
       export VERSION=$(jx-release-version)-snapshot
