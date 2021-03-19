@@ -28,6 +28,7 @@ spec:
     resources: {}
     script: |
       #!/usr/bin/env sh
+      apk add --update git-lfs
       jx gitops git merge
     workingDir: /workspace/source
   - args:
