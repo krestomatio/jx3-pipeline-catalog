@@ -22,7 +22,7 @@ spec:
         echo "git cloning url: $REPO_URL branch $BRANCH_NAME to dir: $SUBDIR"
         git clone -b "$BRANCH_NAME" $REPO_URL $SUBDIR
       fi
-    image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.19.0
+    image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.23.0
     name: git-clone
     resources: { }
     workingDir: /workspace
@@ -31,7 +31,7 @@ spec:
     - --tags
     command:
     - git
-    image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.19.0
+    image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.23.0
     name: git-tags
     workingDir: /workspace/source
   - args:
@@ -41,10 +41,10 @@ spec:
     - --recursive
     command:
     - git
-    image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.19.0
+    image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.23.0
     name: git-submodule
     workingDir: /workspace/source
-  - image: gcr.io/jenkinsxio/jx-release-version:2.2.3
+  - image: gcr.io/jenkinsxio/jx-release-version:2.4.2
     name: next-version
     resources: {}
     workingDir: /workspace/source

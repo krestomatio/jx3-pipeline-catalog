@@ -19,11 +19,11 @@ spec:
       cd $SUBDIR
       git checkout $PULL_PULL_SHA
       echo "checked out revision: $PULL_PULL_SHA to dir: $SUBDIR"
-    image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.19.0
+    image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.23.0
     name: git-clone
     resources: { }
     workingDir: /workspace
-  - image: ghcr.io/jenkins-x/jx-boot:3.1.217
+  - image: ghcr.io/jenkins-x/jx-boot:3.2.23
     name: git-merge
     resources: {}
     script: |
@@ -38,7 +38,7 @@ spec:
     - --recursive
     command:
     - git
-    image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.19.0
+    image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.23.0
     name: git-submodule
     workingDir: /workspace/source
   - args:
@@ -46,10 +46,10 @@ spec:
     - --tags
     command:
     - git
-    image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.19.0
+    image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.23.0
     name: git-tags
     workingDir: /workspace/source
-  - image: gcr.io/jenkinsxio/jx-release-version:2.2.3
+  - image: gcr.io/jenkinsxio/jx-release-version:2.4.2
     name: next-version
     resources: {}
     workingDir: /workspace/source
