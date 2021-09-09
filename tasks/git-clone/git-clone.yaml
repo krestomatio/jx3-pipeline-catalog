@@ -54,7 +54,7 @@ spec:
     image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.23.0
     name: git-submodule
     workingDir: /workspace/source
-  - image: gcr.io/jenkinsxio/jx-release-version:2.4.2
+  - image: ghcr.io/jenkins-x/jx-release-version:2.4.13
     name: next-version
     resources: {}
     workingDir: /workspace/source
