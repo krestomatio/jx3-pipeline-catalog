@@ -63,7 +63,14 @@ spec:
       value: increment
     script: |
       #!/usr/bin/env sh
+      if echo ${PULL_BASE_REF:-} | grep -q '^release.[[:digit:]].[[:digit:]]'; then
+        echo "setting variables for VERSION in release branch: '${PULL_BASE_REF}'"
+        echo "only increment patch based on release number from branch name"
+        export PREVIOUS_VERSION=from-tag:v${PULL_BASE_REF#*release-}
+        export NEXT_VERSION=increment
+      fi
       export VERSION=$(jx-release-version)
+      echo "VERSION = ${VERSION}"
       if ! [ -z ${VERSION_FILE} ]; then
         echo "Set version in VERSION file to: $VERSION"
         echo $VERSION > VERSION
