@@ -24,13 +24,18 @@ spec:
       git config --global --add user.name ${GIT_AUTHOR_NAME:-krestomatio-cibot}
       git config --global --add user.email ${GIT_AUTHOR_EMAIL:-jobcespedes@krestomatio.com}
       git config --global credential.helper store
-      if [ -z "$BRANCH_NAME" ]; then
+      if [ -z "$PULL_BASE_REF" ]; then
         # No branch provided
         echo "git cloning url: $REPO_URL to dir: $SUBDIR"
         git clone $REPO_URL $SUBDIR
       else
-        echo "git cloning url: $REPO_URL branch $BRANCH_NAME to dir: $SUBDIR"
-        git clone -b "$BRANCH_NAME" $REPO_URL $SUBDIR
+        echo "git cloning url: $REPO_URL branch $PULL_BASE_REF to dir: $SUBDIR"
+        git clone -b "$PULL_BASE_REF" $REPO_URL $SUBDIR
+      fi
+      if ! [ -z "$PULL_BASE_SHA" ]; then
+        echo "checked out revision: $PULL_BASE_SHA to dir: $SUBDIR"
+        cd $SUBDIR
+        git reset --hard $PULL_BASE_SHA
       fi
     image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.23.0
     name: git-clone
