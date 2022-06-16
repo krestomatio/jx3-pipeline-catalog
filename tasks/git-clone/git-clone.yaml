@@ -12,7 +12,13 @@ spec:
         name: jx-boot-job-env-vars
         optional: true
     name: ""
-    resources: {}
+    resources:
+      limits:
+        cpu: 200m
+        memory: 256Mi
+      requests:
+        cpu: 10m
+        memory: 16Mi
   workspaces:
   - name: output
     description: The git repo will be cloned onto the volume backing this workspace
@@ -39,7 +45,7 @@ spec:
       fi
     image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.23.0
     name: git-clone
-    resources: { }
+    resources: {}
     workingDir: /workspace
   - args:
     - fetch
@@ -49,6 +55,7 @@ spec:
     image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.23.0
     name: git-tags
     workingDir: /workspace/source
+    resources: {}
   - args:
     - submodule
     - update
@@ -59,6 +66,7 @@ spec:
     image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.23.0
     name: git-submodule
     workingDir: /workspace/source
+    resources: {}
   - image: ghcr.io/jenkins-x/jx-release-version:2.4.13
     name: next-version
     resources: {}
@@ -104,3 +112,4 @@ spec:
     image: quay.io/krestomatio/ansible
     name: project-timestamp
     workingDir: /workspace/source
+    resources: {}

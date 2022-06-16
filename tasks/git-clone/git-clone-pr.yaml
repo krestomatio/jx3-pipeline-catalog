@@ -12,7 +12,13 @@ spec:
         name: jx-boot-job-env-vars
         optional: true
     name: ""
-    resources: {}
+    resources:
+      limits:
+        cpu: 200m
+        memory: 256Mi
+      requests:
+        cpu: 10m
+        memory: 16Mi
   workspaces:
   - name: output
     description: The git repo will be cloned onto the volume backing this workspace
