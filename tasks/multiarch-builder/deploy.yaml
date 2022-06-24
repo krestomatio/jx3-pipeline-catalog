@@ -1,0 +1,52 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: deploy-multiarch-builder
+spec:
+  stepTemplate:
+    env:
+    - name: HOME
+      value: /tekton/home
+    envFrom:
+    - secretRef:
+        name: multiarch-builder-envvars
+        optional: true
+    name: ""
+    resources:
+      limits:
+        cpu: 200m
+        memory: 256Mi
+      requests:
+        cpu: 10m
+        memory: 16Mi
+  workspaces:
+  - name: output
+    description: The terraform module will be install in the volume backing this workspace
+    mountPath: /workspace
+  steps:
+  - name: deploy-multiarch-builder
+    image: quay.io/krestomatio/ansible-docker-ci
+    resources: {}
+    workingDir: /workspace/terraform-aws-multiarch-builder
+    script: |
+      #!/bin/sh -eu
+
+      ## unset vars
+      unset DOCKER_HOST
+      ## set prefix name for multiarch-builder instances
+      REPO_OWNER=${REPO_OWNER:-krestomatio}
+      REPO_NAME=${REPO_NAME:-repo}
+      JOB_NAME=${JOB_NAME:-pr}
+      PULL_NUMBER=${PULL_NUMBER:-0}
+      BUILD_ID=${BUILD_ID:-0}
+      ### TF Variables
+      export TF_VAR_prefix_name=${TF_VAR_prefix_name:-$REPO_OWNER-$REPO_NAME-$JOB_NAME-$PULL_NUMBER-${BUILD_ID}}
+      export TF_VAR_handle_client_config=${TF_VAR_handle_client_config:-true}
+      export TF_VAR_create_client_certs=${TF_VAR_create_client_certs:-true}
+
+      ## deploy multiarch-builder instances using terraform module
+      echo "initializing a terraform working directory with 'multiarch-builder' module"
+      terraform init -input=false -from-module="krestomatio/multiarch-builder/aws"
+      # terraform plan -input=false
+      echo "deploying multiarch-builder with terraform..."
+      terraform apply -input=false -auto-approve || { echo "error found while deploying, cleaning up..."; terraform destroy -input=false -auto-approve; }
