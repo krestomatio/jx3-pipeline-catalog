@@ -19,15 +19,16 @@ spec:
       requests:
         cpu: 10m
         memory: 16Mi
+    workingDir: /terraform-module/terraform-aws-multiarch-builder
   workspaces:
-  - name: output
+  - name: terraform-module
     description: The terraform module will be install in the volume backing this workspace
-    mountPath: /workspace
+    mountPath: /terraform-module
   steps:
   - name: undeploy-multiarch-builder
     image: quay.io/krestomatio/ansible-docker-ci
     resources: {}
-    workingDir: /workspace/terraform-aws-multiarch-builder
+    workingDir: /terraform-module/terraform-aws-multiarch-builder
     script: |
       #!/bin/sh -eu
 
@@ -39,11 +40,21 @@ spec:
       JOB_NAME=${JOB_NAME:-pr}
       PULL_NUMBER=${PULL_NUMBER:-0}
       BUILD_ID=${BUILD_ID:-0}
+      TERRAFORM_WORKING_DIR=${TERRAFORM_WORKING_DIR:-./}
+      TERRAFORM_STATE_DIR=${TERRAFORM_STATE_DIR:-./}
+      TERRAFORM_STATE_FILE=${TERRAFORM_STATE_FILE:-$TERRAFORM_STATE_DIR/terraform.tfstate}
       ### TF Variables
       export TF_VAR_prefix_name=${TF_VAR_prefix_name:-$REPO_OWNER-$REPO_NAME-$JOB_NAME-$PULL_NUMBER-${BUILD_ID}}
       export TF_VAR_handle_client_config=${TF_VAR_handle_client_config:-true}
       export TF_VAR_create_client_certs=${TF_VAR_create_client_certs:-true}
+      export TF_DATA_DIR=${TF_DATA_DIR:-$TERRAFORM_STATE_DIR/.terraform}
+
+      ## create 'TERRAFORM_WORKING_DIR' if necessary
+      [ "${TERRAFORM_WORKING_DIR}" == "./" ] || { mkdir -p "${TERRAFORM_WORKING_DIR}"; cd "${TERRAFORM_WORKING_DIR}"; }
+
+      ## create 'TERRAFORM_STATE_DIR' if necessary
+      [ "${TERRAFORM_STATE_DIR}" == "./" ] || mkdir -p "${TERRAFORM_STATE_DIR}"
 
       ## undeploy multiarch-builder instances using terraform module
       echo "undeploying multiarch-builder with terraform..."
-      test -f terraform.tfstate && terraform destroy -input=false -auto-approve || echo "nothing to undeploy, no terraform state file found"
+      test -f ${TERRAFORM_STATE_FILE} && terraform destroy -input=false -state="${TERRAFORM_STATE_FILE}" -backup="${TERRAFORM_STATE_FILE}.${BUILD_ID}" -auto-approve || echo "nothing to undeploy, no terraform state file found"
