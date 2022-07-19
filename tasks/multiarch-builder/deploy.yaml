@@ -64,4 +64,4 @@ spec:
       fi
       # terraform plan -input=false
       echo "deploying multiarch-builder with terraform..."
-      terraform apply -input=false -state="${TERRAFORM_STATE_FILE}" -backup="${TERRAFORM_STATE_FILE}.${BUILD_ID}" -auto-approve || { echo "error found while deploying, cleaning up..."; terraform destroy -input=false -state="${TERRAFORM_STATE_FILE}" -backup="${TERRAFORM_STATE_FILE}.${BUILD_ID}" -auto-approve; }
+      terraform apply -input=false -state="${TERRAFORM_STATE_FILE}" -backup="${TERRAFORM_STATE_FILE}.${BUILD_ID}" -auto-approve || { echo "error found while deploying, cleaning up..."; terraform destroy -input=false -state="${TERRAFORM_STATE_FILE}" -backup="${TERRAFORM_STATE_FILE}.${BUILD_ID}" -auto-approve; exit 1; }
